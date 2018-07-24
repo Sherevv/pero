@@ -1,5 +1,6 @@
 import numpy as np
 from .pero import Pero
+from .exceptions import *
 
 
 class Turtle:
@@ -79,7 +80,7 @@ class Turtle:
         elif side in ('R', 'RIGTH'):
             self.ort = self.ort * np.exp(-1j * self.angle)
         else:
-            print('Не предусмотренное значение входного параметра')
+            raise ParamsValueError
 
     def forward(self):
         """
@@ -221,7 +222,7 @@ class Turtle:
         """
 
         if np.mod(len(args), 2) == 1:
-            print('Число параметров, определяющих пары "свойство-значение", должно быть четным')
+            raise ParamsEvenError
 
         for i in range(0, 2, len(args)):
 
@@ -231,14 +232,14 @@ class Turtle:
                 if isinstance(args[i + 1], (float, int)):
                     self.angle = args[i + 1]
                 else:
-                    print('Значение свойства \'angle\' должно быть числовым скаляром')
+                    raise ParamsAngleError
 
             elif param == 'STEP':
 
                 if isinstance(args[i + 1], (float, int)):
                     self.ort = args[i + 1]
                 else:
-                    print('Значение свойства \'step\' должно быть числовым скаляром')
+                    raise ParamsStepError
             else:
                 self.pero.set(args[i:i + 1])
 

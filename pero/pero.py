@@ -1,9 +1,9 @@
-import sys
 import time
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, lines
 import matplotlib.colors as mclr
+from .exceptions import *
 
 
 class Pero:
@@ -102,23 +102,20 @@ class Pero:
 
         f = isinstance(args[0], (float, int))
         if f and len(args) != 2:
-            eprint('Число параметров числового типа должно быть 2')
-            return
+            raise CountParamsError
 
         for i in range(len(args)):
             if f and not isinstance(args[i], (float, int)):
-                eprint('1-ый параметр имеет числовой тип, а 2-ой - НЕТ')
-                return
+                raise ParamsTypeError
+
             elif not f and not isinstance(args[i], Pero):
-                eprint('Не все параметры имеют тип Pero')
-                return
+                raise ParamsPeroTypeError
 
         if f:  # && len(args) == 2 && оба имеют тип double
             x = args[0]
             y = args[1]
             if not isinstance(x, (float, int)) or not isinstance(y, (float, int)):
-                eprint('Два входных параметров должены быть числовыми скалярами')
-                return
+                raise ParamsScalarTypeError
 
             self.xdata = np.zeros(self.bufsize, dtype=float)
             self.ydata = np.zeros(self.bufsize, dtype=float)
@@ -227,43 +224,37 @@ class Pero:
         """
 
         if np.mod(len(args), 2) == 1:
-            eprint('Число параметров, определяющих пары "свойство-значение", должно быть четным')
-            return
+            raise ParamsEvenError
 
         for i in range(0, 2, len(args)):
             if not isinstance(args[i], str):
-                eprint('Имя свойства должно быть строкой')
-                return
+                raise ParamsStringError
 
             param = str.upper(args[i])
             if param == 'LINECOLOR':
                 if mclr.is_color_like(args[i + 1]):
                     self.linecolor = args[i + 1]
                 else:
-                    eprint('Недопустимое значение свойства \'lineColor\'')
-                    return
+                    raise ParamsLineColorError
 
             elif param == 'PATCHCOLOR':
                 if mclr.is_color_like(args[i + 1]):
                     self.patchcolor = args[i + 1]
                 else:
-                    eprint('Недопустимое значение свойства \'patchColor\'')
-                    return
+                    raise ParamsPatchColorError
 
             elif param == 'LINESTYLE':
                 if args[i + 1] in ('solid', 'dashed', 'dashdot', 'dotted', '-', '--', '-.', ':', 'None', ' ', ''):
                     self.linestyle = args[i + 1]
                 else:
-                    eprint('Недопустимое значение свойства \'lineStyle\'')
-                    return
+                    raise ParamsLineStyleError
 
             elif param == 'LINEWIDTH':
 
                 if isinstance(args[i + 1], (float, int)):
                     self.linewidth = args[i + 1]
                 else:
-                    eprint('Значение свойства \'lineWidth\' должно быть числовым скаляром')
-                    return
+                    raise ParamsLineWidthError
 
             elif param == 'MARKER':
                 if args[i + 1] in (
@@ -272,29 +263,25 @@ class Pero:
 
                     self.marker = args[i + 1]
                 else:
-                    eprint('Недопустимое значение свойства \'marker\'')
-                    return
+                    raise ParamsMarkerError
 
             elif param == 'MARKERSIZE':
 
                 if isinstance(args[i + 1], (float, int)):
                     self.markersize = args[i + 1]
                 else:
-                    eprint('Значение свойства \'markerSize\' должно быть числовым скаляром')
-                    return
+                    raise ParamsMarkerSizeError
 
             elif param == 'DELAY':
 
                 if isinstance(args[i + 1], (float, int)):
                     self.delay = args[i + 1]
                 else:
-                    eprint('Значение свойства \'delay\' должно быть числовым скаляром')
-                    return
+                    raise ParamsDelayError
 
             elif param == 'BUFSIZE':
                 if self.numpoint > 1:
-                    eprint('Невозможно изменить минимальный размер буфера, когда буфер содержит более 1 точки')
-                    return
+                    raise BufferSizeChangeError
 
                 if isinstance(args[i + 1], int) and args[i + 1] > 0:
                     self.bufsize = args[i + 1]
@@ -311,12 +298,10 @@ class Pero:
                     self.ydata[0:self.numpoint - 1] = ybuf
 
                 else:
-                    eprint('Значение свойства \'bufsize\' должно быть положительным целым скаляром')
-                    return
+                    raise ParamsBufsizeError
 
             else:
-                eprint('Непредусмотренное имя свойства')
-                return
+                raise ParamsNameError
 
     def draw(self, *args):  # type=None, dx=None, dy=None):
         """
@@ -361,10 +346,10 @@ class Pero:
         """
 
         if self.bufsize == 1 and self.daraw_enable_at_bufsize_equal_1 == 'off':
-            eprint('Метод draw не может применяться при установленном размере буфера равным 1')
-            return
+            raise DrawBufsizeError
 
         n = self.numpoint
+        h = None
 
         if self.delay > 0:
             for i in range(n - 1):
@@ -386,11 +371,6 @@ class Pero:
                 self.numpoint = 1
 
                 return
-
-            del h
-            # clear("h")
-
-        # eprint('Непредусмотренное значение параметра')
 
         if len(args) == 0 or args[0] == 'line' or not args[0]:
             h = lines.Line2D(
@@ -419,8 +399,7 @@ class Pero:
             self.hAxes.add_patch(h)
 
         else:
-            eprint('Непредусмотренное значение параметра')
-            return
+            raise ParamsValueError
 
         self.hFig.canvas.draw()
         self.hAxes.relim()
@@ -429,29 +408,19 @@ class Pero:
         dx = 0
         dy = 0
         if len(args) == 2:
-            eprint('Неверное заданы координаты вектора смещения пера')
-            return
+            raise ParamsCoordinatesError
         elif len(args) == 3:
             dx = args[1]
             dy = args[2]
             if not isinstance(dx, (float, int)) or not isinstance(dy, (float, int)):
-                eprint('Неверное заданы координаты вектора смещения пера')
-                return
+                raise ParamsCoordinatesError
 
         elif len(args) > 3:
-            eprint('Слишком много входных параметров')
-            return
+            raise TooManyParamsError
 
         self.xdata[0] = self.xdata[n - 1] + dx
         self.ydata[0] = self.ydata[n - 1] + dy
         self.numpoint = 1
-
-        # if nargout == 0:
-        #     clear("h")
-        # elif nargout == 1:
-        #     h = reshape(h, size(self))
-        # else:
-        #     eprint('Число фактических выходных параметров не может быть больше 1')
 
         return h
 
@@ -478,10 +447,7 @@ class Pero:
         """
 
         if not isinstance(dx, (float, int)) or not isinstance(dy, (float, int)):
-            eprint(
-                'Входные параметры, определяющие координаты вектора '
-                'перемещения пера должены быть числовыми скалярами')
-            return
+            raise ParamsScalarTypeError
 
         if len(self.xdata) == self.numpoint:
             self._add_colon()
@@ -515,8 +481,7 @@ class Pero:
         """
 
         if not isinstance(x, (float, int)) or not isinstance(y, (float, int)):
-            eprint('Входные параметры, определяющие координаты точки линии должены быть числовыми скалярами')
-            return
+            raise ParamsScalarTypeError
 
         if len(self.xdata) == self.numpoint:
             self._add_colon()
@@ -562,8 +527,7 @@ class Pero:
         """
 
         if self.bufsize == 1:
-            eprint('Метод transform не может применяться при установленном размере буфера равным 1')
-            return
+            raise TransformBufsizeError
 
         for i in range(self.numpoint):
             self.xdata[i], self.ydata[i] = f(self.xdata[i], self.ydata[i], *args)
@@ -589,8 +553,7 @@ class Pero:
                 self._print_prime()
                 return
             else:
-                eprint('Unintended parameter value')
-                return
+                raise ParamsValueError
 
         print('The object of the Pero class:')
         print(' - class methods: punct, vector, draw, transform, set, print')
@@ -626,8 +589,3 @@ class Pero:
         """ Increase each buffer array by 1 more column """
         self.xdata = np.append(self.xdata, 0)
         self.ydata = np.append(self.ydata, 0)
-
-
-def eprint(*args, **kwargs):
-    """ Print errors in console """
-    print(*args, file=sys.stderr, **kwargs)
