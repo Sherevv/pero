@@ -2,6 +2,7 @@
 
 Graphic pen based on matplotlib
 
+[Описание на русском](README.ru.md)
 
 # Requirements
 
