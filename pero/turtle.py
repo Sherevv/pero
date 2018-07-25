@@ -66,7 +66,7 @@ class Turtle:
 
         GIVEN:
             - obj = reference to a scalar object of Turtle class
-            - side = direction of turn = (L / LEFT ) / (R / RIGHT) (no regist)
+            - side = direction of turn = (L / LEFT ) / (R / RIGHT) (case-insensitive)
 
         GOTTA:
             - turtle is rotated at a fixed angle in a given
