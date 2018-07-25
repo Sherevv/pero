@@ -208,7 +208,7 @@ class Pero:
         if np.mod(len(args), 2) == 1:
             raise ParamsEvenError
 
-        for i in range(0, 2, len(args)):
+        for i in range(0, len(args), 2):
             if not isinstance(args[i], str):
                 raise ParamsStringError
 

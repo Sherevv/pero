@@ -62,7 +62,7 @@ class Turtle:
         Turn the turtle at a fixed angle in a given direction
 
         SYNTAX:
-            obj.rot( angle )
+            obj.rot( side )
 
         GIVEN:
             - obj = reference to a scalar object of Turtle class
@@ -158,7 +158,7 @@ class Turtle:
         if np.mod(len(args), 2) == 1:
             raise ParamsEvenError
 
-        for i in range(0, 2, len(args)):
+        for i in range(0, len(args), 2):
 
             param = str.upper(args[i])
             if param == 'ANGLE':
@@ -170,7 +170,7 @@ class Turtle:
 
             elif param == 'STEP':
 
-                if isinstance(args[i + 1], (float, int)):
+                if isinstance(args[i + 1], (float, int, complex)):
                     self.ort = args[i + 1]
                 else:
                     raise ParamsStepError
