@@ -243,3 +243,5 @@ python
 >>> p = Pero(1, 1)
 >>> draw_cube(p)
 ```
+
+[Code examples](pero/examples)
