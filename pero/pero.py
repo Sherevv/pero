@@ -8,97 +8,90 @@ from .exceptions import *
 
 class Pero:
     """
-    #Pero Class
-    #
-    #Class method:
-    # Pero, punct, vector, draw, flip, transform, set, print
-    #
-    #-------------------------------------------------------------------------
-    #Version: 1.1
-    #Date: 24.10.2013
+    Class Pero
 
-    # % properties( Access = private )
-    bufsize = 200; print bufsize# - is the column size of the buffer (1-th size of the arrays xdata, ydata)
-    numpoint# - number of line points buffered
-    xdata# - buffer
-    ydata# - buffer
+    Methods:
+        punct, vector, draw, flip, transform, set, print
 
-    daraw_enable_at_bufsize_equal_1 = 'off'; print daraw_enable_at_bufsize_equal_1# - relevant only when bufsize = 1:
-    # used to enable invocation of the method draw of the methods punct, vector
-    # when bufsize = 1
+    Properties of the graphic object (created by the draw method ) by default:
+        linecolor = 'b'
+        patchcolor = 'b' - fill color
+        linewidth = 0.5
+        linestyle =' -'
+        marker = 'none'
+        markersize = 6
 
-    #Properties of the graphic object (created by the draw method ) by default:
-    linecolor = 'b'; print linecolor
-    patchcolor = 'b'; print patchcolor# - fill color
-    linewidth = 0.5; print linewidth
-    linestyle =' -'; print linestyle
-    marker = 'none'; print marker
-    markersize = 6; print markersize
+        bufsize = 200 - is the column size of the buffer (1-th size of the arrays xdata, ydata)
+        numpoint - number of line points buffered
+        xdata - buffer
+        ydata - buffer
 
-    delay = 0; delay print# = added artificial time delay in the execution of the method draw, h
-    #end % % properties private
+        draw_enable_at_bufsize_equal_1 = 'off' - relevant only when bufsize = 1,
+        used to enable invocation of the method draw of the methods punct, vector when bufsize = 1
+
+        delay = 0 - added artificial time delay in the execution of the method draw, h
+
+    -------------------------------------------------------------------------
+
+    The Pero object has an internal buffer.
+    If buffer size (number of points to fit) is 1,
+    plant of the pen (using the methods punct, vector) automatically lead
+    to build the graph. In this case, operations with the buffer using methods
+    draw and transform are not available ( an attempt to execute them results in an error ).
+
+    If the buffer size is greater than 1, move the pen (using
+    methods punct, vector) new point graphics temporarily accumulate
+    in it, but not in the coordinate axes.
+    In this case, you need to use the draw method to build the chart
+    (only the last point is then stored in the buffer).
+
+    Also, if the buffer size is greater than 1, then when the buffer is full, its size
+    automatically increases ( by the value of the original buffer size).
+
+    You can change the buffer size using the set method.
+
     """
 
     def __init__(self, *args):
         """
-        #Pero-class constructor or class method
-        #
-        #SYNTAX:
-        # obj = Pero( x, y );
-        # obj = Pero( p1,..., pn );
-        #GIVEN:
-        # - x, y = initial position coordinates of the pen = double scalars
-        #
-        # OR
-        # p1,..., pn (n>0) - references (< handle) to Pero class objects
-        #
-        #GOTTA:
-        # - obj = reference to a (NEW) Pero class object
-        # - the internal buffer of the obj object contains the coordinates of the initial
-        # the position of your pen
-        #
-        # OR
-        # the internal buffer of an obj object contains a concatenation
-        # the coordinates of the pen positions contained in p1...,p2
-        #-------------------------------------------------------------------------
-        #
-        # The Pero object has an internal buffer.
-        # If buffer size (number of points to fit) is 1,
-        # plant of the pen (using the methods punct, vector) automatically lead
-        # to build the graph. In this case, operations with the buffer using methods
-        # draw and transform are not available ( an attempt to execute them results in an error ).
-        #
-        # If the buffer size is greater than 1, move the pen (using
-        # methods punct, vector) new point graphics temporarily accumulate
-        # in it, but not in the coordinate axes.
-        # In this case, you need to use the draw method to build the chart
-        # (only the last point is then stored in the buffer).
-        #
-        # Also, if the buffer size is greater than 1, then when the buffer is full, its size
-        # automatically increases ( by the value of the original
-        # buffer size).
-        #
-        # You can change the buffer size using the set method.
+        Pero class constructor
+
+        SYNTAX:
+            obj = Pero( x, y )
+            obj = Pero( p1, ..., pn )
+
+        GIVEN:
+            x, y - initial position coordinates of the pen = float scalars
+
+        OR
+            p1,..., pn (n>0) - references to Pero class objects
+
+        GOTTA:
+            - obj = reference to a new Pero class object
+            - the internal buffer of the obj object contains the coordinates of the initial
+            the position of your pen
+
+        OR
+            the internal buffer of an obj object contains a concatenation
+            the coordinates of the pen positions contained in p1...,p2
         """
 
-        self.bufsize = 200  # - размер столбца буфера (1-й размер массивов xdata, ydata)
-        self.numpoint = None  # - число точек линии, помещенных в буфер
-        self.xdata = None  # - x buffer
-        self.ydata = None  # - y buffer
-
-        daraw_enable_at_bufsize_equal_1 = 'off'  # - актуально только при при bufsize = 1:
-        # используется для обеспечения возможности вызова метода draw из методов punct, vector
-        # в случае, когда bufsize = 1
-
-        # Свойства графического объекта ( создаваемого методом draw ) по умолчанию:
+        # Defaults:
         self.linecolor = 'b'
-        self.patchcolor = 'b'  # - цвет заливки
+        self.patchcolor = 'b'
         self.linewidth = 0.5
         self.linestyle = '-'
         self.marker = ''
         self.markersize = 6
+        self.delay = 0
 
-        self.delay = 0  # = дополнительная искуственная временная задержка при выполнении метода draw, сек
+        self.draw_enable_at_bufsize_equal_1 = 'off'
+
+        self.bufsize = 200
+        self.numpoint = None
+
+        self.xdata = None
+        self.ydata = None
 
         f = isinstance(args[0], (float, int))
         if f and len(args) != 2:
@@ -111,7 +104,7 @@ class Pero:
             elif not f and not isinstance(args[i], Pero):
                 raise ParamsPeroTypeError
 
-        if f:  # && len(args) == 2 && оба имеют тип double
+        if f:  # && len(args) == 2 && both are of type float
             x = args[0]
             y = args[1]
             if not isinstance(x, (float, int)) or not isinstance(y, (float, int)):
@@ -123,7 +116,7 @@ class Pero:
             self.xdata[0] = x
             self.ydata[0] = y
             self.numpoint = 1
-        else:  # f == 0 && все элементы args имеют тип Pero
+        else:  # f == 0 && all args elements are of Pero type
 
             n = 0
             m = 0
@@ -131,35 +124,21 @@ class Pero:
                 n = n + len(args[i].xdata)
                 m = m + args[i].numpoint
 
-            self.numpoint = m  # - число точек линии, помещенных в буфер
+            self.numpoint = m
 
             if m <= 200:
-                self.bufsize = 200  # - размер столбца буфера (1-й размер массивов xdata, ydata)
+                self.bufsize = 200
             else:
                 self.bufsize = 2 * m
 
-            self.xdata = np.zeros(self.bufsize, dtype=float)  # - буфер
-            self.ydata = np.zeros(self.bufsize, dtype=float)  # - буфер
+            self.xdata = np.zeros(self.bufsize, dtype=float)
+            self.ydata = np.zeros(self.bufsize, dtype=float)
             m = 0
             for i in range(len(args)):
                 k = args[i].numpoint
                 self.xdata[m:m + k - 1] = args[i].xdata[0:k - 1]
                 self.ydata[m:m + k - 1] = args[i].ydata[0:k - 1]
                 m = m + k
-
-            self.daraw_enable_at_bufsize_equal_1 = 'off'  # - актуально только при при bufsize = 1:
-            # используется для обеспечения возможности вызова метода draw из методов punct, vector
-            # в случае, когда bufsize = 1
-
-            # Свойства графического объекта ( создаваемого методом draw ) по умолчанию:
-            self.linecolor = 'b'
-            self.patchcolor = 'b'  # - цвет заливки
-            self.linewidth = 0.5
-            self.linestyle = '-'
-            self.marker = '.'
-            self.markersize = 6
-
-            self.delay = 0  # = дополнительная искуственная временная задержка при выполнении метода draw, сек
 
         self.hFig = plt.gcf()
         self.hAxes = plt.gca()
@@ -168,11 +147,15 @@ class Pero:
 
     def flip(self):
         """
-        # flip the contents of the object's internal buffer backwards
-        #
-        #SYNTAX:
-        # obj2 = R. flip()
-        :return:
+        Flip the contents of the object's internal buffer backwards
+
+        SYNTAX:
+            obj2 = obj.flip()
+
+        GIVEN:
+            - obj = scalar object of Pero class
+
+        :return: new Pero object with flipped buffer
         """
 
         obj2 = Pero(self)
@@ -182,45 +165,44 @@ class Pero:
 
     def set(self, *args):
         """
-        #set-sets the property values of the Pero class object
-        #
-        #SYNTAX:
-        # self.set ('lineColor', color) % - set line color
-        # self.set ('patchColor', color) % - set fill color
-        # self.set ('lineStyle', style) % - set line style
-        # self.set ('lineWidth', width) % - set line thickness
-        # self.set ('marker', marker) % - set marker type
-        # self.set ('markerSize , size) % - set marker size
-        # self.set ('bufsize', bufSize) % - set buffer size
-        # self.set ('delay', delay) % - set the value of the artificial delay
-        #
-        # any set of properties from this number can also be set at the same time:
-        #
-        # self.set ('lineColor', color,..., 'delay', delay )
-        #
-        # (property-value pairs can follow in any order)
-        #
-        #GIVEN:
-        # - obj = scalar object of Pero class
-        # - color = color = ' b ' | ' r ' | ' g ' | ' y ' | ' k ' | ' w ' | ' m ' / 3-vector double
-        #(initially the color is set to 'b')
-        # - style = line style= '-' | '--' | ':' | '-.'|'none'
-        #(initially the line style is set to' -')
-        # - width = line thickness = scalar double
-        #(initially the line thickness is set to 0.5)
-        # - marker = marker type = + ' | 'o'|'*'/'.'|'x' | 'square' | 'diamond'/...
-        # 'v' | '^' | '>' | '<' | 'pentagram' | 'hexagram' | 'none'
-        # (originally set to 'none' )
-        # - size = marker size = scalar double ( originally set to 6 )
-        # - bufSize = buffer size
-        # - delay = the duration of the artificial delay a sec. = scalar double
-        # (initially set to 0 )
-        #
-        #GOTTA:
-        # - the value of the property (s) has been changed to the corresponding values
+        Set the property values of the Pero class object
 
-        :param args:
-        : return:
+        SYNTAX:
+            obj.set('lineColor', color) % - set line color
+            obj.set('patchColor', color) % - set patch color
+            obj.set('lineStyle', style) % - set line style
+            obj.set('lineWidth', width) % - set line width
+            obj.set('marker', marker) % - set marker type
+            obj.set('markerSize , size) % - set marker size
+            obj.set('bufsize', bufSize) % - set buffer size
+            obj.set('delay', delay) % - set the value of the artificial delay
+
+            any set of properties from this number can also be set at the same time:
+
+            obj.set('lineColor', color,..., 'delay', delay )
+
+            (property-value pairs can follow in any order)
+
+        GIVEN:
+            - obj = scalar object of Pero class
+            - color = color = ' b ' | ' r ' | ' g ' | ' y ' | ' k ' | ' w ' | ' m ' / 3-vector float
+            (initially the color is set to 'b')
+            - style = line style= 'solid', 'dashed', 'dashdot', 'dotted', '-', '--', '-.', ':', 'None', ' ', ''
+            (initially the line style is set to' -')
+            - width = line thickness = scalar float
+            (initially the line thickness is set to 0.5)
+            - marker = marker type = '.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', '8',
+                        '*', '+', '|', '_', 's', 'h', 'H', 'D', 'd', 'p', 'P', 'x', 'X', 'None', ' ', ''
+            (originally set to 'none' )
+            - size = marker size = scalar float ( originally set to 6 )
+            - bufSize = buffer size
+            - delay = the duration of the artificial delay a sec. = scalar float
+            (initially set to 0 )
+
+        GOTTA:
+            - the value of the property (s) has been changed to the corresponding values
+
+        :param args:  -  property-value pairs
         """
 
         if np.mod(len(args), 2) == 1:
@@ -303,53 +285,48 @@ class Pero:
             else:
                 raise ParamsNameError
 
-    def draw(self, *args):  # type=None, dx=None, dy=None):
+    def draw(self, *args):
         """
-        #draw - строит линию или закрашивает участок ( или их
-        #семейство ), координаты точек которой содержатся во внутреннем буфере
-        #
-        #СИНТАКСИС:
-        #           self.draw()
-        #           self.draw( type )
-        #       h = self.draw();
-        #       h = self.draw( type );
-        #           self.draw( type, dx, dy )
-        #       h = self.draw( type, dx, dy );
-        #
-        #ДАНО:
-        # - obj = скалярный объект класса Pero
-        # - установлен размер внутреннего буфера больше 1
-        # - внутренний буфер содержит последовательность координат точек линии
-        # - type = 'line' | 'patch' | []
-        # ( по умолчанию type = 'line'  <=> type = [] )
-        # - dx, dy - координаты вектора смещения пера
-        # ( по умолчанию dx = dy = 0 )
-        #
-        #НАДО:
-        # - в текущих координатных осях построена линия
-        # с предопределенными свойствами
-        # ( изменение предопределенных свойств может быть осуществлено с помощью метода set )
-        #
-        # - h = дескриптор построенной линии
-        # - внутренний буфер содержит только последнюю точку из исходной
-        # последовательности точек, СМЕЩЕННУЮ на вектор dx,dy
-        # ( буфер содержит координаты текущего положения пера )
-        # - построение линии выполнено с дополнительной искуственной временнОй
-        # задержкой на предустановленную величину
-        # ( по умолчанию величина задержки установлена равной 0, изменить
-        # эту установку можно с помощью метода Set )
-        #
-        :param type:
-        :param dx:
-        :param dy:
-        :return:
+        Draw a line or paints over a section ( or both family)
+        whose point coordinates are contained in the internal buffer
+
+        SYNTAX:
+            obj.draw()
+            obj.draw( type )
+            h = obj.draw()
+            h = obj.draw( type )
+            obj.draw( type, dx, dy )
+            h = obj.draw( type, dx, dy )
+
+        GIVEN:
+            - obj = scalar object of Pero class
+            - set internal buffer size greater than 1
+            - the internal buffer contains the coordinate sequence of the line points
+            - type = 'line' | 'patch' | []
+            ( default type = 'line' < = > type = [] )
+            - dx, dy-coordinates of the pen displacement vector
+            (default dx = dy = 0 )
+
+        GOTTA:
+            - a line is built in the current coordinate axes with predefined properties
+            ( changing predefined properties can be done with the set method )
+            - h = descriptor of the constructed line
+            - the internal buffer contains only the last point from the source
+            sequences of points SHIFTED by vector dx, dy
+            (the buffer contains the coordinates of the current pen position )
+            - the construction lines are made with extra artificial temporary
+            a delay of a preset value
+            (default delay value is set to 0, change
+            this setting can be done using the Set method )
+
+        :param args:  -  type, dx, dy
+        :return: h  -  descriptor of the constructed line
         """
 
-        if self.bufsize == 1 and self.daraw_enable_at_bufsize_equal_1 == 'off':
+        if self.bufsize == 1 and self.draw_enable_at_bufsize_equal_1 == 'off':
             raise DrawBufsizeError
 
         n = self.numpoint
-        h = None
 
         if self.delay > 0:
             for i in range(n - 1):
@@ -363,6 +340,10 @@ class Pero:
                     markersize=self.markersize)
 
                 self.hAxes.add_line(h)
+                self.hFig.canvas.draw()
+                self.hAxes.relim()
+                self.hAxes.autoscale()
+
                 time.sleep(self.delay / (n - 1))
 
             if self.bufsize == 1:
@@ -426,24 +407,25 @@ class Pero:
 
     def vector(self, dx=None, dy=None):
         """
-        #vector - "перемещает" перо на заданный вектор от последней точки строящейся линии к новой
-        #
-        #СИНТАКСИС:
-        #           self.vector( dx, dy )
-        #ДАНО:
-        # - obj = скалярный объект класса Pero
-        # - внутренний буфер объекта obj содержит не пустую
-        # последовательность точек (по крайней мере одну точку)
-        # - dx, dy = координаты вектора смещения пера в следующую
-        # точку линии = скаляры double
-        #
-        #НАДО:
-        # - кординаты новой точки графика добавлены в буфер, если
-        # установленный размер буфера больше 1, или новая точка
-        # добавлена непосредственно к графику, если размер буфера равен 1
-        :param dx:
-        :param dy:
-        :return:
+        Move the pen to the specified vector from the last point of the line under construction to the new one
+
+        SYNTAX:
+            obj.vector(dx, dy)
+
+        GIVEN:
+            - obj = scalar object of Pero class
+            - the internal buffer of the object obj does not contain the empty
+            a sequence of points (at least one point)
+            - dx, dy = coordinates of the pen displacement vector to the next
+            line point = float scalars
+
+        GOTTA:
+            - coordinates of a new chart point are added to the buffer if
+            set buffer size greater than 1, or new point
+            added directly to the graph if buffer size is 1
+
+        :param dx:  x coordinates of the pen displacement vector to the next
+        :param dy:  y coordinates of the pen displacement vector to the next
         """
 
         if not isinstance(dx, (float, int)) or not isinstance(dy, (float, int)):
@@ -457,27 +439,28 @@ class Pero:
         self.numpoint += 1
 
         if self.bufsize == 1:
-            self.daraw_enable_at_bufsize_equal_1 = 'on'
+            self.draw_enable_at_bufsize_equal_1 = 'on'
             self.draw()
-            self.daraw_enable_at_bufsize_equal_1 = 'off'
+            self.draw_enable_at_bufsize_equal_1 = 'off'
 
     def punct(self, x=None, y=None):
         """
-        #punct - "перемещает" перо в точку с заданными координатами
-        #
-        #СИНТАКСИС:
-        #           self.punct( x, y )
-        #ДАНО:
-        # - obj = скалярный объект класса Pero
-        # - x,y = координаты точки = скаляры double
-        #
-        #НАДО:
-        # - кординаты точки добавлены в буфер, если
-        # установленный размер буфера больше 1, или новая точка
-        # добавлена непосредственно к графику, если размер буфера равен 1
-        :param x:
-        :param y:
-        :return:
+        Move the pen to a point with specified coordinates
+
+        SYNTAX:
+            obj.punct( x, y )
+
+        GIVEN:
+            - obj = scalar object of Pero class
+            - x, y = point coordinates = float scalars
+
+        GOTTA:
+            - coordinates of a point are added to the buffer if
+            set buffer size greater than 1, or new point
+            added directly to the graph if buffer size is 1
+
+        :param x:  x point coordinate
+        :param y:  y point coordinate
         """
 
         if not isinstance(x, (float, int)) or not isinstance(y, (float, int)):
@@ -491,39 +474,38 @@ class Pero:
         self.numpoint += 1
 
         if self.bufsize == 1:
-            self.daraw_enable_at_bufsize_equal_1 = 'on'
+            self.draw_enable_at_bufsize_equal_1 = 'on'
             self.draw()
-            self.daraw_enable_at_bufsize_equal_1 = 'off'
+            self.draw_enable_at_bufsize_equal_1 = 'off'
 
     def transform(self, f=None, *args):
         """
-         #transform - выполняет преобразование координат точек, нахоящихся в буфере, по заданному закону
-        #
-        #СИНТАКСИС:
-        #           self.transform( f )
-        #           self.transform( f, p1,...,pn )
-        #
-        #ДАНО:
-        # - obj = скалярный объект класса Pero
-        # - установлен размер внутреннего буфера больше 1
-        # - f = ССЫЛКА на функцию  ( function_handle ), осушествляющую
-        # преобразование координатной плоскости и имеющую заголовок вида:
-        #   function [ x2, y2 ] = F( x1, y1 )
-        # или
-        #   function [ x2, y2 ] = F( x1, y1, p1,...,pn )
-        # соответственно, где x1, y1 - декартовы координаты прообраза некоторой
-        # (произвольной) точки плоскости, x2, y2 - декартовы координаты её образа при
-        # отображении F ( имя функции-преобразоания может быть каким угодно, но если,
-        # как в примере, оно F, то входной параметр f = @F - это ССЫЛКА на функцию F )
-        # - p1,...,pn - набор дополнительных параметров для функции f
-        # (число дополнительных параметров и их типы могут быть любыми)
-        #
-        #НАДО:
-        # - координаты всех точек, содержащихся во внутреннем буфере
-        # obj, преобразованы при помощи функции f
-        :param f:
+        Perform the conversion of point coordinates in the buffer according to a given law
+
+        SYNTAX:
+            obj.transform( f )
+            obj.transform( f, p1,..., pn )
+
+        GIVEN:
+            - obj = scalar object of Pero class
+            - set internal buffer size greater than 1
+            - f = LINK to function that dehumidifies
+            convert the coordinate plane and having the header:
+            x2, y2 = F( x1, y1 )
+            or
+            x2, y2  = F( x1, y1, p1,..., pn )
+            respectively, where x1, y1 are Cartesian coordinates of the prototype of some
+            (arbitrary) points of the plane, x2, y2 - Cartesian coordinates of its image at
+            display F ( the name of the transform function can be anything, but if,
+            as in the example, it is F, then the input parameter f = @F is a REFERENCE to the function F )
+            - p1,..., pn - a set of additional parameters for the function f
+            (the number of additional parameters and their types can be any)
+
+        GOTTA:
+            - coordinates of all points contained in the internal buffer
+            obj, converted using the f function
+        :param f: - link to function that dehumidifies transformation
         :param args:
-        :return:
         """
 
         if self.bufsize == 1:
@@ -535,17 +517,17 @@ class Pero:
     def print(self, mode=None):
         """
         Display a Pero class object in the command window
-        #
-        #SYNTAX:
-        # self.print () - displays the Pero class object in the command window ( the main method of use )
-        # self.print ('prime') - displays only basic information and only about the SCALAR object
-        #
-        #GIVEN:
-        # - obj = Pero class object ( not necessarily scalar )
-        # - [mode] = 'prime' - optional flag parameter;
-        # in this case, obj - must be a scalar
-        #
-        : param mode:
+
+        SYNTAX:
+            obj.print() - displays the Pero class object in the command window ( the main method of use )
+            obj.print('prime') - displays only basic information and only about the SCALAR object
+
+        GIVEN:
+            - obj = Pero class object ( not necessarily scalar )
+            - [mode] = 'prime' - optional flag parameter;
+            in this case, obj - must be a scalar
+
+        :param mode:
         """
 
         if mode is not None:

@@ -5,72 +5,75 @@ from .exceptions import *
 
 class Turtle:
     """
-    class Turtle
+    Class Turtle
 
     Methods:
-        forward, rot, draw, transform, set, print ( + методы суперкласса handle )
+        forward, rot, draw, transform, set, print
+
+    --------------------------------------------------------------
+
+    The Turtle object has an internal buffer.
+    If the buffer size is 1, the pen moves
+    automatically lead to a graph. Herewith
+    operations with buffer using draw and Transform methods are not
+    available (trying to execute them results in an error ).
+
+    If the buffer size is greater than 1, move the pen (using
+    methods forward, punct, vector) new point graphics temporarily accumulate
+    in it, but not in the coordinate axes.
+    To build a graph, in this case, you must use the draw method
+    (only the last point is then stored in the buffer).
+
+    Also, if the buffer size is greater than 1, then when the buffer is full, its size
+    automatically increases ( by the value of the original
+    buffer size )
+
+    You can change the buffer size using the set method.
     """
 
     def __init__(self, x=None, y=None):
         """
-        #Turtle - конструктор класса
-        #
-        #СИНТАКСИС:
-        #           obj = Turtle( x, y );
-        #
-        #ДАНО:
-        # - x, y = координаты начального положения черепахи = скаляры double 
-        #
-        # Первоначально внутренний буфер содержит только одну точку, в дальнейшем  
-        # его содержимое может меняться при выполнении методов forward, draw
-        #
-        #НАДО:
-        # - obj = ссылка ( < handle ) на объект класса Turtle
-        # - внутренний буфер объекта obj содержит координаты начального 
-        # положения черепахи
-        #--------------------------------------------------------------
-        #
-        # Объект Turtle имеет внутренний буфер.
-        # При размере буфера, равном 1, пермещения пера
-        # автоматически приводят к построению графика. При этом
-        # операции с буфером при помощи методов draw и Transform не
-        # доступны ( попытка их выполнения приводит к ошибке ).
-        # 
-        # При размере буфера, большем 1, при перемещениях пера (с помощью 
-        # методов Forvard, Punct, Vector) новые точки графика временно накапливаются
-        # в нем, но не отображаются в координатных осях.
-        # Для построеия графика, в этом случае, необходимо применять, метод draw
-        # ( после этого в буфере сохраняется только последняя точка ).            
-        #
-        # Также, если размер буфера больше 1, то при переполнении буфера, его размер 
-        # автоматически увеличивается ( на величину первоначального
-        # размера буфера ) 
-        #
-        # Изменить размер буфера можно с помощью метода set.
+        Turtle class constructor
+
+        SYNTAX:
+            obj = Turtle( x, y )
+
+        GIVEN:
+            - x, y = coordinates of the initial position of the turtle = float scalars
+
+            Initially, the internal buffer contains only one point, later
+            its contents may change when executing forward, draw methods
+
+        GOTTA:
+            - self = reference (<handle ) to a Turtle class object
+            - the internal buffer of the self object contains the coordinates of the initial
+            the position of the turtle
+
         :param x: 
         :param y: 
         """
 
         self.pero = Pero(x, y)
-        self.ort = 1 + 0j  # = вектор (комплесное число), определяющий направление черепахи
-        self.angle = np.pi / 2  # = абсолютная величина угла поворота черепахи
+        self.ort = 1 + 0j  # vector (complex number) that determines the direction of the turtle
+        self.angle = np.pi / 2  # the absolute value of the angle of rotation of the turtle
 
     def rot(self, side=None):
         """
-                #rot - разворачивает черепаху на фиксированный угол в заданном направлении
-        #
-        #СИНТАКСИС:
-        #           self.rot( angle )
-        #ДАНО:
-        # - obj = ссылка на скалярный объект класса Turtle
-        # - side = направление поворота = ( L | LEFT ) | ( R | RIGHT ) (регист значения не имеет)
-        # 
-        #НАДО:
-        # - черепаха поверута на фиксированный угол в заданном
-        # направлении (величину угла можно установить с помощью метода
-        # set, изначально угол равен 90 град.)
-        :param side: 
-        :return: 
+        Turn the turtle at a fixed angle in a given direction
+
+        SYNTAX:
+            obj.rot( angle )
+
+        GIVEN:
+            - obj = reference to a scalar object of Turtle class
+            - side = direction of turn = (L / LEFT ) / (R / RIGHT) (no regist)
+
+        GOTTA:
+            - turtle is rotated at a fixed angle in a given
+            direction (the angle can be set using the method
+            set, initially the angle is 90 degrees.)
+
+        :param side:
         """
 
         side = str.upper(side)
@@ -84,141 +87,72 @@ class Turtle:
 
     def forward(self):
         """
-        #forward - перемещает черепаху вдоль установленного направления на установленный шаг
-        #
-        #СИНТАКСИC:  
-        #           self.forward()
-        #ДАНО: 
-        # - obj = ссылка на скалярный объект класса Turtle
-        #НАДО: 
-        # - черепаха "переместилась" вперед на установленный шаг 
-        #   (изменить величину шага можно спомощью метода set);
-        # - новая точка графика добавлена в буфер ( но не отображена в
-        # координатных осях), если установленный размер буфера равен 1,
-        # или добавлена непосредственно к графику, если размер буфера
-        # равен 1
-        
-        :return: 
+        Move the turtle along the set direction by the set step
+
+        SYNTAX:
+            obj.forward()
+
+        GIVEN:
+            - self = reference to a scalar object of Turtle class
+
+        GOTTA:
+            - turtle "moved" forward to the set step
+            (  (you can change the step value using the set method);
+            new point added to the buffer ( but not shown in
+            coordinate axes) if the buffer size is set to 1,
+            or added directly to the graph if buffer size
+            equals 1
         """
 
         self.pero.vector(self.ort.real, self.ort.imag)
 
     def draw(self, draw_type=None):
         """
-        #draw - строит линию или закрашивает участок ( или их
-        #семейство ), координаты точек которой содержатся во внутреннем буфере
-        #
-        #СИНТАКСИС:
-        #           self.draw()
-        #           self.draw( type )
-        #       h = self.draw();
-        #       h = self.draw( type );
-        #
-        #ДАНО:            
-        # - obj = скалярный объект класса Pero
-        # - установлен размер внутреннего буфера больше 1            
-        # - внутренний буфер содержит последовательность координат точек линии 
-        # - type = 'line' | 'patch'
-        # ( по умолчанию type = 'line' )
-        #
-        #НАДО:
-        # - в текущих координатных осях построена линия 
-        # с предопределенными свойствами 
-        # ( изменение предопределенных свойств может быть осуществлено с помощью метода set )
-        # 
-        # - h = дескриптор построенной линии
-        # - внутренний буфер содержит только последнюю точку из исходной
-        # последовательности точек ( = координаты текущего положения пера )
-        # - построение линии выполнено с дополнительной искуственной временнОй 
-        # задержкой на предустановленную величину
-        # ( по умолчанию величина задержки установлена равной 0, изменить
-        # эту установку можно с помощью метода Set )
-        #
-        :param draw_type:
-        :return: 
+        Draw a line or paints over a section ( or both family)
+        whose point coordinates are contained in the internal buffer
+
+        See draw method of the Pero class
         """
 
         return self.pero.draw(draw_type)
 
     def transform(self, f=None, *args):
         """
-         #transform - выполняет преобразование координат точек, нахоящихся в буфере, по заданному закону
-        #
-        #СИНТАКСИС:
-        #           self.transform( f )
-        #           self.transform( f, p1,...,pn )
-        #
-        #ДАНО:
-        # - obj = скалярный объект класса Pero
-        # - установлен размер внутреннего буфера больше 1
-        # - f = ССЫЛКА на функцию (function_handle), осушествляющую
-        # преобразование координатной плоскости и имеющую заголовок вида:
-        #   function [ x2, y2 ] = F( x1, y1 ) 
-        # или 
-        #   function [ x2, y2 ] = F( x1, y1, p1,...,pn )
-        # соответственно, где x1, y1 - декартовы координаты прообраза некоторой
-        # (произвольной) точки плоскости, x2, y2 - декартовы координаты её образа при
-        # отображении F ( имя функции-преобразоания может быть каким угодно, но если, 
-        # как в примере, оно F, то входной параметр f = @F - это ССЫЛКА на функцию F )
-        # - p1,...,pn - набор дополнительных параметров для функции f 
-        # (число дополнительных параметров и их типы могут быть любыми)
-        #
-        #НАДО:
-        # - координаты всех точек, содержащихся во внутреннем буфере
-        # obj, преобразованы при помощи функции f
-        :param f: 
-        :param args: 
+        Perform the conversion of point coordinates in the buffer according to a given law
+
+        See transform method of the Pero class
         """
 
         self.pero.transform(f, *args)
 
     def set(self, *args):
         """
-        #set - устанавливает значения свойств объекта класса Turtle
-        #
-        #СИНТАКСИС:
-        #       self.set( 'angle'     , angle )   % - установка абсолютной величины угла поворота черепахи
-        #       self.set( 'step'      , step )    % - установка величины шага черепахи
-        #       self.set( 'lineColor' , color )   % - установка цвета линии
-        #       self.set( 'patchColor', color )   % - установка цвета заливки
-        #       self.set( 'lineStyle' , style )   % - установка стиля линии
-        #       self.set( 'lineWidth' , width )   % - установка толщины линии
-        #       self.set( 'marker'    , marker )  % - установка типа маркера
-        #       self.set( 'markerSize , size )    % - установка размера маркера
-        #       self.set( 'bufsize'   , bufSize ) % - установка размера буфера
-        #       self.set( 'delay'     , delay )   % - установка величины искуственной задержки
-        #
-        #   также любой набор свойств из этого числа можно устанавливать одновременно:    
-        #    
-        #       self.set( 'angle', angle, 'step', step, 'lineColor', color,..., 'delay', delay )
-        #    
-        #   (пары "свойство-значение" могут следовать в любом порядке)        
-        #
-        #ДАНО:
-        # - obj   = скалярный объект класса Turtle
-        # - angle = абсолютная величина угла поворота черепахи в рад.
-        # ( изначально установлен угол np.pi/2 )
-        # - step  = величина шага черепахи ( изначально установлен шаг 1 ) 
-        #   -----------------------------------------------------------
-        # - color = цвет = 'b' | 'r' | 'g' | 'y' | 'k' | 'w' | 'm' | 3-вектор double  
-        #(изначально цвет устанавливается равным 'b')
-        # - style = стиль линии = '-' | '--' | ':' | '-.' | 'none'   
-        #(изначально стиль линии устанавливается равным '-')
-        # - width  = толщина линии = скаляр double
-        #(изначально толщина линии устанавливается равной 0.5)
-        # - marker = вид маркеров = +' | 'o' | '*' | '.' | 'x' | 'square' | 'diamond' | ...
-        #                        'v' | '^' | '>' | '<' | 'pentagram' | 'hexagram' | 'none'
-        #( изначально установлено значение 'none' )
-        # - size = размер маркеров = скаляр double ( изначально установлено значение 6 )
-        #   -----------------------------------------------------------
-        # - bufSize = размер буфера ( число вмещаемых в него точек; изначально устан размер 1 )            
-        # - delay = длительность искуственной задержки в сек. = скаляр double
-        #( изначально установлено значение 0 )
-        #
-        #НАДО: 
-        # - значение свойства (свойств) изменено на соответствующие значения             
-        :param args: 
-        :return: 
+        Set the property values of the Turtle class object
+
+        SYNTAX:
+            obj.set('angle', angle) % - sets the absolute value of the turtle's turning angle
+            obj.set('step', step) % - set the turtle step value
+
+            Other properties see in set method of a Pero class
+
+            any set of properties from this number can also be set at the same time:
+
+            obj.set ('angle', angle,' step', step,' lineColor', color,..., 'delay', delay )
+
+            (property-value pairs can follow in any order)
+
+        GIVEN:
+            - obj = scalar object of Turtle class
+            - angle = the absolute value of the turtle's turning angle into rad.
+            ( originally set in the corner np.pi/2 )
+            step = step size of the turtle ( originally set in step 1 )
+            -----------------------------------------------------------
+            Other properties see in set method of the Pero class
+
+        GOTTA:
+         - the value of the property (s) has been changed to the corresponding values
+
+        :param args:
         """
 
         if np.mod(len(args), 2) == 1:
@@ -244,14 +178,15 @@ class Turtle:
                 self.pero.set(args[i:i + 1])
 
     def print(self):
-        """ Displays information about object in console """
+        """ Display information about turtle object in console """
 
         print()
-        print('Объект класса Turtle:')
-        print(' - аргумент (град.) и модуль вектора направления черепахи = ', str(np.angle(self.ort, deg=True)),
+        print('The object of the Turtle class:')
+        print(' - argument (deg.) and the module of the vector of the direction of the turtle = ',
+              str(np.angle(self.ort, deg=True)),
               abs(self.ort))
-        print(' - абсолютная величина угла поворота = ', str(self.angle * 180 / np.pi), ' град.')
+        print(' - absolute value of rotation angle = ', str(self.angle * 180 / np.pi), ' deg.')
 
         self.pero.print('prime')
 
-        print(' - методы класса: rot, forward, draw, set, print')
+        print(' - class methods: rot, forward, draw, set, print')
