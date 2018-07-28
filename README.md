@@ -1,6 +1,6 @@
 # Pero
 
-Graphic pen based on matplotlib. Also include Turtle class (see below).
+Graphic pero based on matplotlib. Also include Turtle class (see below).
 
 [Описание на русском](README.ru.md)
 
@@ -42,7 +42,7 @@ pip install git+https://github.com/Sherevv/pero.git
     obj = Pero( x, y )
     obj = Pero( p1,...,pn ) 
     
-`x, y` - initial position coordinates of the pen
+`x, y` - initial position coordinates of the pero
 
 or
  
@@ -53,27 +53,27 @@ or
 
 The Pero object has an internal buffer.
 If buffer size (number of points to fit) is 1,
-plant of the pen (using the methods punct, vector) automatically lead
+plant of the pero (using the methods `punct`, `vector`) automatically lead
 to build the graph. In this case, operations with the buffer using methods
-draw and transform are not available ( an attempt to execute them results in an error ).
+`draw` and `transform` are not available ( an attempt to execute them results in an error ).
 
-If the buffer size is greater than 1, move the pen (using
-methods punct, vector) new point graphics temporarily accumulate
+If the buffer size is greater than 1, move the pero (using
+methods `punct`, `vector`) new point graphics temporarily accumulate
 in it, but not in the coordinate axes.
-In this case, you need to use the draw method to build the chart
+In this case, you need to use the `draw` method to build the plot
 (only the last point is then stored in the buffer).
 
 Also, if the buffer size is greater than 1, then when the buffer is full, its size
-automatically increases ( by the value of the original buffer size).
+automatically increases (by the value of the original buffer size).
 
-You can change the buffer size using the set method.
+You can change the buffer size using the `set` method.
 
 ## Methods of Pero
-**punct()** - move the pen to a point with specified coordinates
+**punct()** - move the pero to a point with specified coordinates
 
     obj.punct( x, y )
 
-**vector()** - move the pen to the specified vector from the last point of the line under construction to the new one 
+**vector()** - move the pero to the specified vector from the last point of the line under construction to the new one 
     
     obj.vector( dx, dy )
     
@@ -95,7 +95,7 @@ any set of properties from this number can also be set at the same time:
 (property-value pairs can follow in any order)        
 
 Parameters:
-`color` = `'b' | 'r' | 'g' | 'y' | 'k' | 'w' | 'm' | вектор из 3-х чисел`  
+`color` = `'b' | 'r' | 'g' | 'y' | 'k' | 'w' | 'm' | 3-d vector`  
 (initially the color is set to`'b'`)  or other [values](https://matplotlib.org/api/colors_api.html)
 
 `style` = `'solid', 'dashed', 'dashdot', 'dotted', '-', '--', '-.', ':', 'None', ' ', ''` 
@@ -125,7 +125,7 @@ Parameters:
 
 `type` = `'line' | 'patch'`  (default type = `'line'`)
 
-`dx, dy` - coordinates of the pen displacement vector (default dx = dy = `0`)
+`dx, dy` - coordinates of the pero displacement vector (default dx = dy = `0`)
 
 `h` - constructed line object
 
@@ -151,7 +151,7 @@ Parameters:
 # Turtle class
 
 The Turtle class is a wrapper over the Pero class.
-It has two properties (in addition to pen properties): step size and rotation angle.
+It has two properties (in addition to pero properties): step size and rotation angle.
 `step` is specified by a complex number, method `forward()` moves the turtle along the vector `(Re(step), Im(step))`.
 
     obj = Turtle( x, y )
